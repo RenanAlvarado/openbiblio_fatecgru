@@ -43,6 +43,13 @@ $trans["opac_WelcomeMsg"]    = "\$text=
   'Welcome to our library\'s online public access catalog.  Search our catalog
    to view bibliography information on holdings we have in our library.';";
 $trans["opac_SearchTitle"]   = "\$text='Search Bibliography by Search Phrase:';";
+$trans["opac_SearchHeading"] = "\$text='Search Bibliography';";
+$trans["opac_SearchTypeLabel"] = "\$text='Search type';";
+$trans["opac_AllCollection"] = "\$text='Entire collection';";
+$trans["opac_SortLabel"] = "\$text='Sort results by';";
+$trans["opac_EmptyCollection"] = "\$text='The public collection has no available records.';";
+$trans["opac_CopySingular"] = "\$text='copy';";
+$trans["opac_CopyPlural"] = "\$text='copies';";
 $trans["opac_Keyword"]       = "\$text='Keyword';";
 $trans["opac_Title"]         = "\$text='Title';";
 $trans["opac_Author"]        = "\$text='Author';";

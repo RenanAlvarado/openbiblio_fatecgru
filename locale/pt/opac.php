@@ -43,6 +43,13 @@ $trans["opac_WelcomeMsg"]    = "\$text=
   'Bem-vindo ao nosso Catálogo de Acesso Público.
    Pesquise em nosso catálogo para encontrar materiais bibliográficos.';";
 $trans["opac_SearchTitle"]   = "\$text='Pesquisar bibliografia por frase de pesquisa:';";
+$trans["opac_SearchHeading"] = "\$text='Pesquisar Bibliografia';";
+$trans["opac_SearchTypeLabel"] = "\$text='Tipo de pesquisa';";
+$trans["opac_AllCollection"] = "\$text='Todo o acervo';";
+$trans["opac_SortLabel"] = "\$text='Ordenar resultados por';";
+$trans["opac_EmptyCollection"] = "\$text='O acervo público não possui registros disponíveis.';";
+$trans["opac_CopySingular"] = "\$text='exemplar';";
+$trans["opac_CopyPlural"] = "\$text='exemplares';";
 $trans["opac_Keyword"]       = "\$text='Palavra-chave';";
 $trans["opac_Title"]         = "\$text='Título';";
 $trans["opac_Author"]        = "\$text='Autor';";

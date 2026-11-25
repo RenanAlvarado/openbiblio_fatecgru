@@ -35,11 +35,11 @@
   </section>
 
   <section class="opac-search-panel" aria-labelledby="opac-search-heading">
-    <h2 id="opac-search-heading"><?php echo $loc->getText("opac_SearchTitle");?></h2>
+    <h2 id="opac-search-heading"><?php echo $loc->getText("opac_SearchHeading");?></h2>
     <form class="opac-search-form" name="phrasesearch" method="POST" action="../shared/biblio_search.php">
       <div class="opac-search-controls">
         <div class="opac-search-field">
-          <label class="opac-search-label" for="opac-search-type"><?php echo $loc->getText("opac_SearchTitle");?></label>
+          <label class="opac-search-label" for="opac-search-type"><?php echo $loc->getText("opac_SearchTypeLabel");?></label>
           <select id="opac-search-type" name="searchType">
             <option value="keyword"<?php if ($lookup !== 'Y') { ?> selected<?php } ?>><?php echo $loc->getText("opac_Keyword");?></option>
             <option value="title"><?php echo $loc->getText("opac_Title");?></option>

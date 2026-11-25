@@ -20,6 +20,9 @@ echo ">\n";
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="OpenBiblio Library Automation System">
 <title><?php echo H(OBIB_LIBRARY_NAME);?></title>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-fatecgru-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-fatecgru-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="../images/favicon-fatecgru-48.png">
 <style type="text/css">
   <?php include("../css/style.php");?>
 </style>

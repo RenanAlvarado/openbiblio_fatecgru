@@ -237,7 +237,7 @@
           encodeFormValue("sortBy", sortField ? sortField.value : "default")
         ];
         xhr.send(values.join("&"));
-      }, 200);
+      }, 120);
     }
 
     input.addEventListener("input", requestSuggestions);

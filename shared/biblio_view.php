@@ -128,9 +128,40 @@
     $callNumber = trim($biblio->getCallNmbr1()." ".$biblio->getCallNmbr2()." ".$biblio->getCallNmbr3());
     $title = isset($biblioFlds["245a"]) ? trim($biblioFlds["245a"]->getFieldData()) : "";
     $author = isset($biblioFlds["100a"]) ? trim($biblioFlds["100a"]->getFieldData()) : "";
+    $returnSearchContext = false;
+    $returnSearchTypes = array("keyword", "title", "author", "subject", "callno", "barcodeNmbr");
+    if (isset($_GET["returnSearch"]) && is_string($_GET["returnSearch"]) && $_GET["returnSearch"] == "Y"
+        && isset($_GET["searchType"]) && is_string($_GET["searchType"]) && in_array($_GET["searchType"], $returnSearchTypes, true)
+        && isset($_GET["searchText"]) && is_string($_GET["searchText"]) && mb_strlen($_GET["searchText"], "UTF-8") <= 256
+        && isset($_GET["sortBy"]) && is_string($_GET["sortBy"]) && in_array($_GET["sortBy"], array("title", "author"), true)
+        && isset($_GET["page"]) && is_string($_GET["page"]) && preg_match('/^[0-9]+$/', $_GET["page"]) && intval($_GET["page"]) > 0
+        && isset($_GET["lookup"]) && is_string($_GET["lookup"]) && in_array($_GET["lookup"], array("Y", "N"), true)) {
+      $returnSearchContext = array(
+        "searchType" => $_GET["searchType"],
+        "searchText" => $_GET["searchText"],
+        "sortBy" => $_GET["sortBy"],
+        "page" => intval($_GET["page"]),
+        "lookup" => $_GET["lookup"]
+      );
+    }
 ?>
 <main class="opac-detail">
   <?php if ($msg != "") { ?><div class="opac-message" role="status"><?php echo $msg; ?></div><?php } ?>
+  <div class="opac-detail-return">
+    <?php if ($returnSearchContext !== false) { ?>
+      <form method="POST" action="../shared/biblio_search.php">
+        <input type="hidden" name="tab" value="opac">
+        <input type="hidden" name="searchType" value="<?php echo H($returnSearchContext["searchType"]); ?>">
+        <input type="hidden" name="searchText" value="<?php echo H($returnSearchContext["searchText"]); ?>">
+        <input type="hidden" name="sortBy" value="<?php echo H($returnSearchContext["sortBy"]); ?>">
+        <input type="hidden" name="page" value="<?php echo H($returnSearchContext["page"]); ?>">
+        <input type="hidden" name="lookup" value="<?php echo H($returnSearchContext["lookup"]); ?>">
+        <button class="opac-return-button" type="submit">Voltar aos resultados</button>
+      </form>
+    <?php } else { ?>
+      <a class="opac-return-button" href="../opac/index.php<?php if (isset($_GET["lookup"]) && is_string($_GET["lookup"]) && $_GET["lookup"] == "Y") echo "?lookup=Y"; ?>">Voltar aos resultados</a>
+    <?php } ?>
+  </div>
   <article class="opac-detail-card">
     <header class="opac-detail-heading">
       <?php if (isset($materialImageFiles[$materialCd]) && $materialImageFiles[$materialCd] != "") { ?>

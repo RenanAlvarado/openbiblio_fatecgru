@@ -78,9 +78,6 @@ function __construct() {
     $this->_pageCount = 0;
     $this->_currentCopyCount = 0;
 
-    # setting sql join clause
-    $join = "from biblio left join biblio_copy on biblio.bibid=biblio_copy.bibid ";
-
     # setting sql where clause
     $bField = false;
     $criteria = "";
@@ -91,7 +88,16 @@ function __construct() {
     } else {
       $words = array();
     }
-    if ((sizeof($words) == 0) || ($words[0] == "")) {
+    $hasSearchTerms = !((sizeof($words) == 0) || ($words[0] == ""));
+
+    # Public result cards represent bibliographies, not individual copies.
+    # Keep the copy join only where the public search criterion needs barcodes.
+    $join = "from biblio ";
+    if (!$opacFlg || ($type == OBIB_SEARCH_BARCODE && $hasSearchTerms)) {
+      $join .= "left join biblio_copy on biblio.bibid=biblio_copy.bibid ";
+    }
+
+    if (!$hasSearchTerms) {
       if ($opacFlg) $criteria = "where opac_flg = 'Y' ";
     } else {
       if ($type == OBIB_SEARCH_BARCODE) {
@@ -192,20 +198,25 @@ function __construct() {
     # setting query that will return all the data
     # sql_calc_found_rows is efficient for counting rows on unefficient queries...
     $sql = "select sql_calc_found_rows ";
-    if ($bField) $sql .= "distinct ";
+    if ($bField || ($opacFlg && $type == OBIB_SEARCH_BARCODE && $hasSearchTerms)) $sql .= "distinct ";
     $sql .= "biblio.* ";
     if ($opacFlg) {
       $sql .= ",(select count(*) from biblio_copy as copy_count_q where copy_count_q.bibid=biblio.bibid) as copy_count ";
     }
-    $sql .= ",biblio_copy.copyid ";
-    $sql .= ",biblio_copy.barcode_nmbr ";
-    $sql .= ",biblio_copy.status_cd ";
-    $sql .= ",biblio_copy.due_back_dt ";
-    $sql .= ",biblio_copy.mbrid ";
-    $sql .= ",biblio_copy.renewal_count ";
+    if (!$opacFlg) {
+      $sql .= ",biblio_copy.copyid ";
+      $sql .= ",biblio_copy.barcode_nmbr ";
+      $sql .= ",biblio_copy.status_cd ";
+      $sql .= ",biblio_copy.due_back_dt ";
+      $sql .= ",biblio_copy.mbrid ";
+      $sql .= ",biblio_copy.renewal_count ";
+    }
     $sql .= $join;
     $sql .= $criteria;
     $sql .= $this->mkSQL(" order by %C ", $sortBy);
+    if ($opacFlg) {
+      $sql .= ", biblio.bibid asc ";
+    }
 
     # setting limit so we can page through the results
     $offset = ($page - 1) * $this->_itemsPerPage;
