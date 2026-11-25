@@ -1,0 +1,32 @@
+# Configurações locais e credenciais
+database_constants.php
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+
+# Dependências instaladas (se houver Composer)
+vendor/
+
+# Arquivos de cache
+cache/
+tmp/
