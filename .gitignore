@@ -4,6 +4,9 @@ database_constants.php
 .env.*
 !.env.example
 
+# AI
+AGENTS.md
+
 # Logs
 *.log
 logs/

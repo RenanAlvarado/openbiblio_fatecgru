@@ -2,6 +2,47 @@
 /* This file is part of a copyrighted work; it is distributed with NO WARRANTY.
  * See the file COPYRIGHT.html for more details.
  */
+
+  $opacSuggestRequest = isset($_POST["suggest"]) && $_POST["suggest"] === "Y";
+  if ($opacSuggestRequest) {
+    $GLOBALS["opacSuggestRequest"] = true;
+    $GLOBALS["opacSuggestResponseSent"] = false;
+    ob_start();
+    register_shutdown_function("opacSuggestJsonShutdown");
+  }
+
+  function opacSendSuggestionJson($items, $statusCode) {
+    $json = json_encode(array("items" => $items));
+    if ($json === false) {
+      $json = '{"items":[]}';
+    }
+    while (ob_get_level() > 0) {
+      ob_end_clean();
+    }
+    if (function_exists("header_remove")) {
+      header_remove("Location");
+    }
+    if ($statusCode == 403) {
+      header("HTTP/1.1 403 Forbidden");
+    } elseif ($statusCode == 400) {
+      header("HTTP/1.1 400 Bad Request");
+    } elseif ($statusCode >= 500) {
+      header("HTTP/1.1 500 Internal Server Error");
+    } else {
+      header("HTTP/1.1 200 OK");
+    }
+    header("Content-Type: application/json; charset=utf-8");
+    header("Cache-Control: no-store, no-cache, must-revalidate");
+    $GLOBALS["opacSuggestResponseSent"] = true;
+    echo $json;
+  }
+
+  function opacSuggestJsonShutdown() {
+    if (empty($GLOBALS["opacSuggestRequest"]) || !empty($GLOBALS["opacSuggestResponseSent"])) {
+      return;
+    }
+    opacSendSuggestionJson(array(), 500);
+  }
  
   require_once("../shared/common.php");
   session_cache_limiter(null);
@@ -23,6 +64,10 @@
   if (isset($_POST["tab"])) {
     $tab = $_POST["tab"];
   }
+  if ($opacSuggestRequest && $tab != "opac") {
+    opacSendSuggestionJson(array(), 403);
+    exit();
+  }
   if (isset($_POST["lookup"])) {
     $lookup = $_POST["lookup"];
     if ($lookup == 'Y') {
@@ -38,6 +83,21 @@
   require_once("../classes/BiblioSearchQuery.php");
   require_once("../functions/searchFuncs.php");
   require_once("../classes/DmQuery.php");
+
+  if ($opacSuggestRequest) {
+    $suggestTypes = array("keyword", "title", "author", "subject", "callno", "barcodeNmbr");
+    if (!isset($_POST["searchType"]) || !is_string($_POST["searchType"])
+        || !in_array($_POST["searchType"], $suggestTypes, true)
+        || !isset($_POST["searchText"]) || !is_string($_POST["searchText"])) {
+      opacSendSuggestionJson(array(), 400);
+      exit();
+    }
+    $suggestText = trim($_POST["searchText"]);
+    if (mb_strlen($suggestText, "UTF-8") < 3 || mb_strlen($suggestText, "UTF-8") > 256) {
+      opacSendSuggestionJson(array(), 200);
+      exit();
+    }
+  }
 
   #****************************************************************************
   #*  Function declaration only used on this page.
@@ -67,27 +127,70 @@
     }
   }
 
+  function printOpacSearchPanel(&$loc, $searchText, $searchType, $lookup) {
+    $types = array("keyword" => "opac_Keyword", "title" => "opac_Title", "author" => "opac_Author", "subject" => "opac_Subject", "callno" => "opac_Callno");
+    $inputLabelKey = isset($types[$searchType]) ? $types[$searchType] : "opac_Keyword";
+    echo '<section class="opac-search-panel opac-results-search" aria-labelledby="opac-results-search-title">';
+    echo '<h1 id="opac-results-search-title">'.$loc->getText("opac_SearchTitle").'</h1>';
+    echo '<form class="opac-search-form" name="opacSearchForm" method="POST" action="../shared/biblio_search.php">';
+    echo '<div class="opac-search-controls"><div class="opac-search-field"><label class="opac-search-label" for="opac-search-type">'.$loc->getText("opac_SearchTitle").'</label><select id="opac-search-type" name="searchType">';
+    foreach ($types as $value => $labelKey) {
+      echo '<option value="'.H($value).'"'.($searchType == $value ? ' selected="selected"' : '').'>'.$loc->getText($labelKey).'</option>';
+    }
+    echo '</select></div><div class="opac-search-field"><label class="opac-search-label opac-search-input-label" for="opac-search-text">'.$loc->getText($inputLabelKey).'</label><div class="opac-suggest-wrap">';
+    echo '<input class="opac-search-input" id="opac-search-text" type="text" name="searchText" maxlength="256" value="'.H($searchText).'" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="opac-search-suggestions">';
+    echo '<ul class="opac-suggestions" id="opac-search-suggestions" role="listbox" hidden="hidden"></ul></div></div>';
+    echo '<input type="hidden" name="sortBy" value="default"><input type="hidden" name="tab" value="opac"><input type="hidden" name="lookup" value="'.H($lookup).'">';
+    echo '<div class="opac-search-action"><span class="opac-search-label" aria-hidden="true">&nbsp;</span><button class="opac-search-button" type="submit">'.$loc->getText("opac_Search").'</button></div></div></form></section>';
+  }
+
+  function printOpacResultPages(&$loc, $currPage, $pageCount, $sort) {
+    if ($pageCount <= 1) return false;
+    echo '<nav class="opac-pagination" aria-label="'.H($loc->getText("biblioSearchResultPages")).'">';
+    if ($currPage > 1) echo '<a href="javascript:changePage('.H($currPage-1).',\''.H($sort).'\')">&laquo; '.$loc->getText("biblioSearchPrev").'</a>';
+    else echo '<span class="opac-page-disabled" aria-disabled="true">&laquo; '.$loc->getText("biblioSearchPrev").'</span>';
+    $maxPg = OBIB_SEARCH_MAXPAGES + 1;
+    for ($i = 1; $i <= $pageCount; $i++) {
+      if ($i < $maxPg) {
+        if ($i == $currPage) echo '<span class="opac-page-current" aria-current="page">'.H($i).'</span>';
+        else echo '<a href="javascript:changePage('.H($i).',\''.H($sort).'\')">'.H($i).'</a>';
+      } elseif ($i == $maxPg) echo '<span class="opac-page-ellipsis">&hellip;</span>';
+    }
+    if ($currPage < $pageCount) echo '<a href="javascript:changePage('.H($currPage+1).',\''.H($sort).'\')">'.$loc->getText("biblioSearchNext").' &raquo;</a>';
+    else echo '<span class="opac-page-disabled" aria-disabled="true">'.$loc->getText("biblioSearchNext").' &raquo;</span>';
+    echo '</nav>';
+    return true;
+  }
+
   #****************************************************************************
   #*  Loading a few domain tables into associative arrays
   #****************************************************************************
-  $dmQ = new DmQuery();
-  $dmQ->connect();
-  $collectionDm = $dmQ->getAssoc("collection_dm");
-  $materialTypeDm = $dmQ->getAssoc("material_type_dm");
-  $materialImageFiles = $dmQ->getAssoc("material_type_dm", "image_file");
-  $biblioStatusDm = $dmQ->getAssoc("biblio_status_dm");
-  $dmQ->close();
+  if (!$opacSuggestRequest) {
+    $dmQ = new DmQuery();
+    $dmQ->connect();
+    $collectionDm = $dmQ->getAssoc("collection_dm");
+    $materialTypeDm = $dmQ->getAssoc("material_type_dm");
+    $materialImageFiles = $dmQ->getAssoc("material_type_dm", "image_file");
+    $biblioStatusDm = $dmQ->getAssoc("biblio_status_dm");
+    $dmQ->close();
+  }
 
   #****************************************************************************
   #*  Retrieving post vars and scrubbing the data
   #****************************************************************************
-  if (isset($_POST["page"])) {
+  if ($opacSuggestRequest) {
+    $currentPageNmbr = 1;
+  } elseif (isset($_POST["page"])) {
     $currentPageNmbr = intval($_POST["page"]);
   } else {
     $currentPageNmbr = 1;
   }
   $searchType = $_POST["searchType"];
-  $sortBy = $_POST["sortBy"];
+  if ($opacSuggestRequest) {
+    $sortBy = "default";
+  } else {
+    $sortBy = $_POST["sortBy"];
+  }
   if ($sortBy == "default") {
     if ($searchType == "author") {
       $sortBy = "author";
@@ -120,7 +223,11 @@
   #*  Search database
   #****************************************************************************
   $biblioQ = new BiblioSearchQuery();
-  $biblioQ->setItemsPerPage(OBIB_ITEMS_PER_PAGE);
+  if ($opacSuggestRequest) {
+    $biblioQ->setItemsPerPage(25);
+  } else {
+    $biblioQ->setItemsPerPage(OBIB_ITEMS_PER_PAGE);
+  }
   $biblioQ->connect();
   if ($biblioQ->errorOccurred()) {
     $biblioQ->close();
@@ -135,6 +242,34 @@
   if (!$biblioQ->search($sType,$words,$currentPageNmbr,$sortBy,$opacFlg)) {
     $biblioQ->close();
     displayErrorPage($biblioQ);
+  }
+
+  if ($opacSuggestRequest) {
+    $items = array();
+    $seenBibids = array();
+    while ($biblio = $biblioQ->fetchRow()) {
+      $bibid = $biblio->getBibid();
+      if (isset($seenBibids[$bibid])) {
+        continue;
+      }
+      $seenBibids[$bibid] = true;
+      $title = trim($biblio->getTitle());
+      if ($title == "") {
+        continue;
+      }
+      $callNumber = trim($biblio->getCallNmbr1()." ".$biblio->getCallNmbr2()." ".$biblio->getCallNmbr3());
+      $items[] = array(
+        "title" => $title,
+        "author" => $biblio->getAuthor(),
+        "callNumber" => $callNumber
+      );
+      if (count($items) >= 5) {
+        break;
+      }
+    }
+    $biblioQ->close();
+    opacSendSuggestionJson($items, 200);
+    exit();
   }
 
   # Redirect to biblio_view if only one result
@@ -154,11 +289,24 @@
   }
   require_once("../classes/Localize.php");
   $loc = new Localize(OBIB_LOCALE,"shared");
+  if ($tab == "opac") {
+    $opacLoc = new Localize(OBIB_LOCALE,"opac");
+  }
 
   # Display no results message if no results returned from search.
   if ($biblioQ->getRowCount() == 0) {
     $biblioQ->close();
-    echo $loc->getText("biblioSearchNoResults");
+    if ($tab == "opac") {
+      printOpacSearchPanel($opacLoc, $searchText, $searchType, $lookup);
+      echo '<section class="opac-results" aria-labelledby="opac-results-title"><div class="opac-results-summary">';
+      echo '<h2 id="opac-results-title">'.$loc->getText("biblioSearchResults").'</h2>';
+      $typeLabels = array("keyword" => "opac_Keyword", "title" => "opac_Title", "author" => "opac_Author", "subject" => "opac_Subject", "callno" => "opac_Callno");
+      $typeLabel = $opacLoc->getText(isset($typeLabels[$searchType]) ? $typeLabels[$searchType] : "opac_Keyword");
+      echo '<p>'.H($loc->getText("biblioSearchResultTxt",array("items"=>0))).'</p><p><strong>'.H($opacLoc->getText("opac_Search")).':</strong> '.H($searchText).' <span class="opac-search-type-summary">'.H($typeLabel).'</span></p></div>';
+      echo '<p class="opac-empty-state">'.$loc->getText("biblioSearchNoResults").'</p></section>';
+    } else {
+      echo $loc->getText("biblioSearchNoResults");
+    }
     require_once("../shared/footer.php");
     exit();
   }
@@ -190,6 +338,82 @@ function changePage(page,sort)
   <input type="hidden" name="page" value="1">
   <input type="hidden" name="tab" value="<?php echo H($tab);?>">
 </form>
+
+<?php if ($tab == "opac") { ?>
+<?php printOpacSearchPanel($opacLoc, $searchText, $searchType, $lookup); ?>
+<section class="opac-results" aria-labelledby="opac-results-title">
+  <div class="opac-results-summary">
+    <h2 id="opac-results-title"><?php echo $loc->getText("biblioSearchResults"); ?></h2>
+    <p><?php echo H($loc->getText("biblioSearchResultTxt",array("items"=>$biblioQ->getRowCount()))); ?></p>
+    <p><strong><?php echo H($opacLoc->getText("opac_Search")); ?>:</strong> <?php echo H($searchText); ?>
+      <span class="opac-search-type-summary"><?php
+        $typeLabels = array("keyword" => "opac_Keyword", "title" => "opac_Title", "author" => "opac_Author", "subject" => "opac_Subject", "callno" => "opac_Callno");
+        echo H($opacLoc->getText(isset($typeLabels[$searchType]) ? $typeLabels[$searchType] : "opac_Keyword"));
+      ?></span>
+    </p>
+  </div>
+  <?php if ($biblioQ->getRowCount() > 1) { ?>
+  <div class="opac-sort-controls">
+    <span><?php echo $loc->getText("biblioSearch".$sortBy); ?></span>
+    <?php if ($sortBy == "author") { ?>
+      <a href="javascript:changePage(<?php echo H($currentPageNmbr); ?>,'title')"><?php echo $loc->getText("biblioSearchSortByTitle"); ?></a>
+    <?php } else { ?>
+      <a href="javascript:changePage(<?php echo H($currentPageNmbr); ?>,'author')"><?php echo $loc->getText("biblioSearchSortByAuthor"); ?></a>
+    <?php } ?>
+  </div>
+  <?php } ?>
+  <?php printOpacResultPages($loc, $currentPageNmbr, $biblioQ->getPageCount(), $sortBy); ?>
+  <div class="opac-results-list">
+  <?php
+    $priorBibid = 0;
+    while ($biblio = $biblioQ->fetchRow()) {
+      $isNewBiblio = ($biblio->getBibid() != $priorBibid);
+      if ($isNewBiblio) {
+        if ($priorBibid != 0) {
+          echo '</div></article>';
+        }
+        $priorBibid = $biblio->getBibid();
+        $materialCd = $biblio->getMaterialCd();
+        $collectionCd = $biblio->getCollectionCd();
+        $materialLabel = isset($materialTypeDm[$materialCd]) ? $materialTypeDm[$materialCd] : $materialCd;
+        $collectionLabel = isset($collectionDm[$collectionCd]) ? $collectionDm[$collectionCd] : $collectionCd;
+  ?>
+    <article class="opac-result-card">
+      <header class="opac-result-heading">
+        <span class="opac-result-number"><?php echo H($biblioQ->getCurrentRowNmbr());?>.</span>
+        <?php if (isset($materialImageFiles[$materialCd]) && $materialImageFiles[$materialCd] != "") { ?>
+        <a class="opac-material-icon" href="../shared/biblio_view.php?bibid=<?php echo HURL($biblio->getBibid());?>&amp;tab=<?php echo HURL($tab);?><?php if ($lookup == 'Y') echo '&amp;lookup=Y'; ?>"><img src="../images/<?php echo HURL($materialImageFiles[$materialCd]);?>" width="20" height="20" border="0" align="bottom" alt="<?php echo H($materialLabel);?>"></a>
+        <?php } ?>
+        <h3><a href="../shared/biblio_view.php?bibid=<?php echo HURL($biblio->getBibid());?>&amp;tab=<?php echo HURL($tab);?><?php if ($lookup == 'Y') echo '&amp;lookup=Y'; ?>"><?php echo H($biblio->getTitle());?></a></h3>
+      </header>
+      <dl class="opac-biblio-details">
+        <div><dt><?php echo $loc->getText("biblioSearchAuthor"); ?>:</dt><dd><?php if ($biblio->getAuthor() != "") echo H($biblio->getAuthor());?></dd></div>
+        <div><dt><?php echo $loc->getText("biblioSearchMaterial"); ?>:</dt><dd><?php echo H($materialLabel);?></dd></div>
+        <div><dt><?php echo $loc->getText("biblioSearchCollection"); ?>:</dt><dd><?php echo H($collectionLabel);?></dd></div>
+        <div><dt><?php echo $loc->getText("biblioSearchCall"); ?>:</dt><dd><?php echo H($biblio->getCallNmbr1()." ".$biblio->getCallNmbr2()." ".$biblio->getCallNmbr3());?></dd></div>
+      </dl>
+      <div class="opac-copies-summary">
+        <?php $copyCount = $biblioQ->getCurrentCopyCount(); ?>
+        <?php if ($copyCount > 0) { ?>
+          <span class="opac-copy-count"><strong><?php echo H($copyCount); ?></strong> <?php echo $copyCount == 1 ? "exemplar" : "exemplares"; ?></span>
+        <?php } else { ?>
+          <span class="opac-no-copies"><?php echo $loc->getText("biblioViewNoCopies"); ?></span>
+        <?php } ?>
+      </div>
+      <?php } ?>
+  <?php
+    }
+    if ($priorBibid != 0) {
+      echo '</div></article>';
+    }
+    $pageCount = $biblioQ->getPageCount();
+    $biblioQ->close();
+  ?>
+  </div>
+  <?php printOpacResultPages($loc, $currentPageNmbr, $pageCount, $sortBy); ?>
+</section>
+<?php require_once("../shared/footer.php"); exit(); ?>
+<?php } ?>
 
 <!--**************************************************************************
     *  Printing result stats and page nav

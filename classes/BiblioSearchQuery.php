@@ -24,6 +24,7 @@ class BiblioSearchQuery extends Query {
   var $_currentPageNmbr = 0;
   var $_rowCount = 0;
   var $_pageCount = 0;
+  var $_currentCopyCount = 0;
   var $_loc;
 
   
@@ -50,6 +51,9 @@ function __construct() {
   function getPageCount() {
     return $this->_pageCount;
   }
+  function getCurrentCopyCount() {
+    return $this->_currentCopyCount;
+  }
 
   /****************************************************************************
    * Executes a query
@@ -72,6 +76,7 @@ function __construct() {
     $this->_currentPageNmbr = $page;
     $this->_rowCount = 0;
     $this->_pageCount = 0;
+    $this->_currentCopyCount = 0;
 
     # setting sql join clause
     $join = "from biblio left join biblio_copy on biblio.bibid=biblio_copy.bibid ";
@@ -104,7 +109,7 @@ function __construct() {
           if (strlen($words[$i]) < $drop + 3) {
             $wordsQ = preg_quote($words[$i]);
             $join .= "and bf".$i.".field_data ";
-            $join .= $this->mkSQL("rlike %Q ", "[[:<:]]".$wordsQ);
+            $join .= $this->mkSQL("rlike %Q ", '\\b'.$wordsQ);
           }
           $join .= "and not bf".$i.".subfield_cd regexp('[0-9]') ";
         }
@@ -128,7 +133,7 @@ function __construct() {
           if (strlen($words[$i]) < $drop + 3) {
             $wordsQ = preg_quote($words[$i]);
             $join .= "and bf".$i.".field_data ";
-            $join .= $this->mkSQL("rlike %Q ", "[[:<:]]".$wordsQ);
+            $join .= $this->mkSQL("rlike %Q ", '\\b'.$wordsQ);
           }
           $join .= "and not bf".$i.".subfield_cd regexp('[0-9]') ";
         }
@@ -163,7 +168,7 @@ function __construct() {
           if (strlen($words[$i]) < $drop + 3) {
             $wordsQ = preg_quote($words[$i]);
             $join .= "and bf".$i.".field_data ";
-            $join .= $this->mkSQL("rlike %Q ", "[[:<:]]".$wordsQ);
+            $join .= $this->mkSQL("rlike %Q ", '\\b'.$wordsQ);
           }
           $join .= "and not (bf".$i.".tag = '260' and bf".$i.".subfield_cd in ('a', 'b', 'e', 'f', 'g')) ";
           if ($opacFlg) $join .= "and not (bf".$i.".tag in ('526', '856') and bf".$i.".subfield_cd = 'x') ";
@@ -189,6 +194,9 @@ function __construct() {
     $sql = "select sql_calc_found_rows ";
     if ($bField) $sql .= "distinct ";
     $sql .= "biblio.* ";
+    if ($opacFlg) {
+      $sql .= ",(select count(*) from biblio_copy as copy_count_q where copy_count_q.bibid=biblio.bibid) as copy_count ";
+    }
     $sql .= ",biblio_copy.copyid ";
     $sql .= ",biblio_copy.barcode_nmbr ";
     $sql .= ",biblio_copy.status_cd ";
@@ -308,6 +316,7 @@ function __construct() {
     # increment rowNmbr
     $this->_rowNmbr = $this->_rowNmbr + 1;
     $this->_currentRowNmbr = $this->_rowNmbr + (($this->_currentPageNmbr - 1) * $this->_itemsPerPage);
+    $this->_currentCopyCount = isset($array["copy_count"]) ? intval($array["copy_count"]) : 0;
     
     $bib = new BiblioSearch();
     $bib->setBibid($array["bibid"]);
