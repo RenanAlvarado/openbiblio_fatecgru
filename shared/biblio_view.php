@@ -151,6 +151,7 @@
     <?php if ($returnSearchContext !== false) { ?>
       <form method="POST" action="../shared/biblio_search.php">
         <input type="hidden" name="tab" value="opac">
+        <input type="hidden" name="returnFromView" value="Y">
         <input type="hidden" name="searchType" value="<?php echo H($returnSearchContext["searchType"]); ?>">
         <input type="hidden" name="searchText" value="<?php echo H($returnSearchContext["searchText"]); ?>">
         <input type="hidden" name="sortBy" value="<?php echo H($returnSearchContext["sortBy"]); ?>">

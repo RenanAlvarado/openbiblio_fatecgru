@@ -348,8 +348,12 @@
     exit();
   }
 
-  # Redirect to biblio_view if only one result
-  if ($biblioQ->getRowCount() == 1 && $lookup !== 'Y' && ($tab != "opac" || !$isBrowseAll)) {
+  $opacReturnFromDetails = ($tab == "opac" && isset($_POST["returnFromView"])
+    && is_string($_POST["returnFromView"]) && $_POST["returnFromView"] === "Y");
+
+  # Redirect to biblio_view if only one result, except when returning from details.
+  if ($biblioQ->getRowCount() == 1 && $lookup !== 'Y' && ($tab != "opac" || !$isBrowseAll)
+      && !$opacReturnFromDetails) {
     $biblio = $biblioQ->fetchRow();
     $redirect = '../shared/biblio_view.php?bibid='.U($biblio->getBibid()).'&tab='.U($tab);
     if ($tab == "opac") {

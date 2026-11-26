@@ -55,7 +55,6 @@ function returnLookup(formName,fieldName,val) {
       <header class="opac-header">
         <div class="opac-brand">
           <img class="opac-brand-logo" src="../images/logofatecgru.png" alt="Fatec Guarulhos, Centro Paula Souza e Governo do Estado de São Paulo">
-          <div class="opac-library-name"><?php echo H(OBIB_LIBRARY_NAME); ?></div>
         </div>
         <div class="opac-library-info">
           <div class="opac-info-item">

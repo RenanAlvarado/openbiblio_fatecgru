@@ -22,6 +22,12 @@
   --opac-shadow-card: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
+.opac-page *,
+.opac-page *::before,
+.opac-page *::after {
+  box-sizing: border-box;
+}
+
 .opac-page {
   min-width: 320px;
   margin: 0;
@@ -47,44 +53,65 @@
 .opac-page .opac-header {
   display: flex;
   width: min(1120px, calc(100% - 48px));
-  min-height: 122px;
+  min-height: 96px;
   margin: 0 auto;
-  padding: var(--opac-space-4) 0;
+  padding: var(--opac-space-3) 0;
   align-items: center;
   justify-content: space-between;
-  gap: var(--opac-space-6);
+  gap: var(--opac-space-8);
 }
 
 .opac-page .opac-brand {
+  flex: 0 1 460px;
   min-width: 0;
 }
 
 .opac-page .opac-brand-logo {
   display: block;
-  width: min(100%, 560px);
+  width: min(100%, 460px);
   height: auto;
-}
-
-.opac-page .opac-library-name {
-  margin-top: var(--opac-space-1);
-  color: var(--opac-color-muted);
-  font-size: 0.875rem;
 }
 
 .opac-page .opac-library-info {
   display: grid;
-  flex: 0 0 auto;
-  gap: var(--opac-space-1);
-  font-size: 0.8125rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  align-items: stretch;
+  gap: var(--opac-space-2) var(--opac-space-4);
+  font-size: 0.75rem;
 }
 
 .opac-page .opac-info-item {
+  box-sizing: border-box;
   display: flex;
-  gap: var(--opac-space-2);
+  min-width: 0;
+  min-height: 52px;
+  padding: 6px 8px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--opac-space-1);
+  border: 1px solid var(--opac-color-border);
+  border-radius: var(--opac-radius-control);
+  background: var(--opac-color-surface-muted);
+  text-align: center;
 }
 
 .opac-page .opac-info-label {
+  color: var(--opac-color-muted);
+  font-size: 0.6875rem;
+  font-weight: normal;
+  line-height: 1.3;
+}
+
+.opac-page .opac-info-item > span:last-child {
+  color: var(--opac-color-text);
+  font-size: 0.8125rem;
   font-weight: bold;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .opac-page .opac-nav-cell {
@@ -93,16 +120,36 @@
 }
 
 .opac-page .opac-nav {
-  width: min(1120px, calc(100% - 48px));
-  margin: 0 auto;
+  width: 100%;
 }
 
 .opac-page .opac-nav-links {
+  box-sizing: border-box;
   display: flex;
+  width: 100%;
+  padding: 0 24px;
   min-height: 48px;
   align-items: center;
+  justify-content: space-between;
   gap: var(--opac-space-2) var(--opac-space-6);
   color: var(--opac-color-surface);
+}
+
+.opac-page .opac-nav-utilities,
+.opac-page .opac-nav-primary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--opac-space-2);
+}
+
+.opac-page .opac-nav-utilities {
+  order: 2;
+  margin-left: auto;
+}
+
+.opac-page .opac-nav-primary {
+  order: 1;
 }
 
 .opac-page .opac-nav-links br {
@@ -136,6 +183,7 @@
 .opac-page .opac-main-cell > font.primary {
   display: block;
   width: min(100%, 1120px);
+  min-width: 0;
   margin: 0 auto;
   color: var(--opac-color-text);
   font-family: var(--opac-font-family);
@@ -156,9 +204,9 @@
 .opac-page .opac-eyebrow {
   margin: 0 0 var(--opac-space-2);
   color: var(--opac-color-brand);
-  font-size: 0.875rem;
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
   font-weight: bold;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 .opac-page .opac-intro h1 {
@@ -333,6 +381,7 @@
 }
 
 .opac-page .opac-results-search {
+  box-sizing: border-box;
   width: min(100%, 960px);
   margin: 0 auto var(--opac-space-6);
 }
@@ -377,12 +426,14 @@
 
 .opac-page .opac-search-type-summary {
   display: inline-block;
+  max-width: 100%;
   margin-left: var(--opac-space-2);
   padding: 2px var(--opac-space-2);
   border-radius: 999px;
   background: var(--opac-color-surface);
   color: var(--opac-color-text);
   font-size: 0.8125rem;
+  overflow-wrap: anywhere;
 }
 
 .opac-page .opac-sort-controls {
@@ -628,6 +679,9 @@
 
 .opac-page .opac-main-cell > font[face] {
   display: block;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
   padding-top: var(--opac-space-6);
   color: var(--opac-color-muted) !important;
   font-family: var(--opac-font-family) !important;
@@ -636,8 +690,10 @@
 }
 
 .opac-page .opac-main-cell > font[face] center {
+  width: 100%;
   max-width: 1120px;
   margin: 0 auto;
+  overflow-wrap: anywhere;
 }
 
 .opac-page .opac-main-cell > font[face] a,
@@ -650,10 +706,24 @@
   height: auto;
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-  .opac-page .opac-header,
-  .opac-page .opac-nav {
+@media (min-width: 768px) and (max-width: 1023px) {
+  .opac-page .opac-header {
     width: calc(100% - 48px);
+    min-height: 0;
+    padding: var(--opac-space-3) 0;
+    gap: var(--opac-space-6);
+  }
+
+  .opac-page .opac-brand {
+    flex-basis: 40%;
+  }
+
+  .opac-page .opac-brand-logo {
+    width: min(100%, 380px);
+  }
+
+  .opac-page .opac-library-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .opac-page .opac-main-cell {
@@ -691,31 +761,42 @@
   .opac-page .opac-header {
     width: calc(100% - 32px);
     min-height: 0;
-    padding: var(--opac-space-4) 0;
+    padding: var(--opac-space-3) 0;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--opac-space-3);
   }
 
+  .opac-page .opac-brand {
+    width: 100%;
+  }
+
   .opac-page .opac-brand-logo {
-    width: min(100%, 520px);
+    width: min(100%, 460px);
   }
 
   .opac-page .opac-library-info {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
-    gap: var(--opac-space-2) var(--opac-space-4);
-  }
-
-  .opac-page .opac-nav {
-    width: calc(100% - 32px);
+    gap: var(--opac-space-2) var(--opac-space-3);
   }
 
   .opac-page .opac-nav-links {
     min-height: 48px;
     flex-wrap: wrap;
-    gap: 0 var(--opac-space-2);
-    padding: var(--opac-space-1) 0;
+    justify-content: space-between;
+    gap: var(--opac-space-2) var(--opac-space-4);
+    padding: var(--opac-space-1) 16px;
+  }
+
+  .opac-page .opac-nav-utilities,
+  .opac-page .opac-nav-primary {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .opac-page .opac-nav-primary {
+    justify-content: flex-start;
   }
 
   .opac-page .opac-main-cell {
@@ -823,22 +904,32 @@
     flex-wrap: wrap;
     overflow-wrap: anywhere;
   }
+
+  .opac-page .opac-detail-copy-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--opac-space-2);
+  }
+
+  .opac-page .opac-detail-copy-actions > span[aria-hidden="true"] {
+    display: none;
+  }
 }
 
 @media (min-width: 360px) and (max-width: 479px) {
-  .opac-page .opac-header,
-  .opac-page .opac-nav {
+  .opac-page .opac-header {
     width: calc(100% - 32px);
+  }
+
+  .opac-page .opac-nav-links {
+    padding-right: 16px;
+    padding-left: 16px;
   }
 
   .opac-page .opac-main-cell {
     padding-right: 16px;
     padding-left: 16px;
-  }
-
-  .opac-page .opac-info-item {
-    flex-direction: column;
-    gap: 0;
   }
 
   .opac-page .opac-header {
@@ -899,14 +990,34 @@
 }
 
 @media (max-width: 359px) {
-  .opac-page .opac-header,
-  .opac-page .opac-nav {
+  .opac-page .opac-header {
     width: calc(100% - 24px);
+  }
+
+  .opac-page .opac-nav-links {
+    padding-right: 12px;
+    padding-left: 12px;
   }
 
   .opac-page .opac-main-cell {
     padding-right: 12px;
     padding-left: 12px;
+  }
+
+  .opac-page .opac-search-panel,
+  .opac-page .opac-results-search,
+  .opac-page .opac-detail-card {
+    padding: 12px;
+  }
+
+  .opac-page .opac-nav-links a {
+    padding-right: 4px;
+    padding-left: 4px;
+    font-size: 0.875rem;
+  }
+
+  .opac-page .opac-library-info {
+    column-gap: var(--opac-space-2);
   }
 }
 
@@ -1099,5 +1210,135 @@
 
   .opac-page .opac-detail-heading {
     gap: var(--opac-space-3);
+  }
+}
+
+/* Refinements for the institutional header and native search controls. */
+.opac-page .opac-header {
+  gap: clamp(24px, 4vw, 48px);
+}
+
+.opac-page .opac-library-info {
+  align-self: center;
+  gap: var(--opac-space-2) var(--opac-space-3);
+}
+
+.opac-page .opac-info-item {
+  min-height: 58px;
+  padding: 8px 10px;
+  border-top: 2px solid var(--opac-color-accent);
+  border-radius: var(--opac-radius-control);
+  background: var(--opac-color-surface-muted);
+}
+
+.opac-page .opac-info-label {
+  font-size: 0.6875rem;
+  font-weight: bold;
+  letter-spacing: 0.025em;
+}
+
+.opac-page .opac-info-item > span:last-child {
+  font-size: 0.875rem;
+}
+
+.opac-page .opac-search-controls select,
+.opac-page .opac-sort-controls select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  min-height: 44px;
+  padding: 8px 36px 8px 10px;
+  border-radius: var(--opac-radius-control);
+  background-color: var(--opac-color-surface);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--opac-color-accent) 50%),
+    linear-gradient(135deg, var(--opac-color-accent) 50%, transparent 50%);
+  background-position:
+    calc(100% - 17px) 50%,
+    calc(100% - 12px) 50%;
+  background-repeat: no-repeat;
+  background-size: 5px 5px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.opac-page .opac-search-controls select:hover,
+.opac-page .opac-sort-controls select:hover {
+  border-color: var(--opac-color-accent);
+}
+
+.opac-page .opac-search-controls select:focus,
+.opac-page .opac-sort-controls select:focus {
+  border-color: var(--opac-color-focus);
+  outline: 3px solid rgba(0, 92, 110, 0.18);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 1px var(--opac-color-focus);
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .opac-page .opac-info-item:nth-child(3):last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .opac-page .opac-header {
+    width: calc(100% - 32px);
+    padding-top: var(--opac-space-3);
+    padding-bottom: var(--opac-space-3);
+    gap: 0;
+  }
+
+  .opac-page .opac-brand,
+  .opac-page .opac-brand-logo {
+    display: none;
+  }
+
+  .opac-page .opac-library-info {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .opac-page .opac-info-item:nth-child(3):last-child {
+    grid-column: 1 / -1;
+  }
+
+  .opac-page .opac-nav-links {
+    align-items: stretch;
+    row-gap: var(--opac-space-1);
+  }
+
+  .opac-page .opac-nav-utilities,
+  .opac-page .opac-nav-primary {
+    align-items: center;
+  }
+
+  .opac-page .opac-nav-links a,
+  .opac-page .opac-nav-current {
+    min-height: 44px;
+    line-height: 1.35;
+  }
+
+  .opac-page .opac-suggestions {
+    position: static;
+    width: 100%;
+    max-height: min(34vh, 180px);
+    margin-top: var(--opac-space-2);
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-width: 359px) {
+  .opac-page .opac-header {
+    width: calc(100% - 24px);
+  }
+
+  .opac-page .opac-library-info {
+    gap: var(--opac-space-2);
+  }
+
+  .opac-page .opac-info-item {
+    padding-right: 6px;
+    padding-left: 6px;
   }
 }

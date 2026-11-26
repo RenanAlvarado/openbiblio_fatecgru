@@ -8,18 +8,22 @@
 ?>
 
 
-<?php if ($nav == "home") { ?>
- &raquo; <?php echo $navLoc->getText("catalogSearch1"); ?><br>
-<?php } else { ?>
- <a href="../opac/index.php<?php if (isset($lookup) && $lookup == "Y") echo "?lookup=Y"; ?> " class="alt1"><?php echo $navLoc->getText("catalogSearch2"); ?></a><br>
-<?php } ?>
+<div class="opac-nav-utilities">
+  <a href="javascript:popSecondary('../shared/help.php<?php if (isset($helpPage)) echo "?page=".H(addslashes(U($helpPage))); ?>')"><?php echo $navLoc->getText("Help"); ?></a>
+  <a href="/openbiblio_fatecgru/shared/loginform.php">Área administrativa</a>
+</div>
+<div class="opac-nav-primary">
+  <?php if ($nav == "home") { ?>
+    <a href="../opac/index.php<?php if (isset($lookup) && $lookup == "Y") echo "?lookup=Y"; ?>" class="alt1"><?php echo $navLoc->getText("catalogSearch1"); ?></a>
+  <?php } else { ?>
+    <a href="../opac/index.php<?php if (isset($lookup) && $lookup == "Y") echo "?lookup=Y"; ?>" class="alt1"><?php echo $navLoc->getText("catalogSearch2"); ?></a>
+  <?php } ?>
 
-<?php if ($nav == "search") { ?>
- &raquo; <?php echo $navLoc->getText("catalogResults"); ?><br>
-<?php } ?>
+  <?php if ($nav == "search") { ?>
+    <span class="opac-nav-current">&raquo; <?php echo $navLoc->getText("catalogResults"); ?></span>
+  <?php } ?>
 
-<?php if ($nav == "view") { ?>
- &raquo; <?php echo $navLoc->getText("catalogBibInfo"); ?><br>
-<?php } ?>
-
-<a href="javascript:popSecondary('../shared/help.php<?php if (isset($helpPage)) echo "?page=".H(addslashes(U($helpPage))); ?>')"><?php echo $navLoc->getText("Help"); ?></a>
+  <?php if ($nav == "view") { ?>
+    <span class="opac-nav-current">&raquo; <?php echo $navLoc->getText("catalogBibInfo"); ?></span>
+  <?php } ?>
+</div>

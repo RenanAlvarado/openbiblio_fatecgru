@@ -28,6 +28,7 @@
     var responseCache = {};
     var responseCacheKeys = [];
     var lastRequestedKey = "";
+    var lastTouchTapTime = 0;
 
     if (!input || !searchType || !tabField || !lookupField || !list || tabField.value !== "opac") {
       return;
@@ -241,6 +242,21 @@
     }
 
     input.addEventListener("input", requestSuggestions);
+    input.addEventListener("dblclick", function () {
+      input.select();
+    });
+    input.addEventListener("touchend", function (event) {
+      var currentTime = new Date().getTime();
+      if (lastTouchTapTime > 0 && currentTime - lastTouchTapTime <= 450) {
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+        input.select();
+        lastTouchTapTime = 0;
+      } else {
+        lastTouchTapTime = currentTime;
+      }
+    }, false);
     updateInputLabel();
     searchType.addEventListener("change", function () {
       updateInputLabel();

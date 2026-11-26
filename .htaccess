@@ -1,0 +1,5 @@
+# Bloqueia o acesso direto ao arquivo de configurações do banco
+
+<Files "database_constants.php">
+Require all denied
+</Files>
