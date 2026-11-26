@@ -122,7 +122,8 @@
   #**************************************************************************
   #*  Redirect to return page
   #**************************************************************************
-  header("Location: ".$_SESSION["returnPage"]);
+  $returnPage = isset($_SESSION["returnPage"]) ? $_SESSION["returnPage"] : "../home/index.php";
+  header("Location: ".$returnPage);
   exit();
 
 ?>

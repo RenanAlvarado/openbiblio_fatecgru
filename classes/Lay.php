@@ -549,6 +549,9 @@ class Lay_Paragraph extends Lay_Columns {
 
 /* Not an element, used for underlining by Lay_TextLines and Lay_TextLine */
 class Lay_Underline {
+  function __construct(&$display, $length, $width) {
+    $this->Lay_Underline($display, $length, $width);
+  }
   function Lay_Underline(&$display, $length, $width) {
     $this->display =& $display;
     $this->length = $length;
@@ -621,6 +624,9 @@ class Lay_TextLine extends Lay_Line {
 class Lay_Top_Container {
   var $parent = NULL;
   var $display;
+  function __construct(&$display) {
+    $this->Lay_Top_Container($display);
+  }
   function Lay_Top_Container(&$display) {
     $this->display =& $display;
     $this->child_max_dim = $this->display->dimensions();
@@ -640,6 +646,9 @@ class Lay_Top_Container {
 class Lay {
   var $display;
   var $current;
+  function __construct($paper='letter', $orientation='portrait') {
+    $this->Lay($paper, $orientation);
+  }
   function Lay($paper='letter', $orientation='portrait') {
     if (is_array($paper)) {
       list($l, $err) = $this->lengthToPoints($paper[0], 'x');
@@ -722,7 +731,7 @@ class Lay {
       switch ($type) {
       case 'x-length':
       case 'y-length':
-        list($len, $err) = $this->lengthToPoints($p[$name], $type{0});
+        list($len, $err) = $this->lengthToPoints($p[$name], $type[0]);
         $p[$name] = $len;
         break;
       case 'x-align':
@@ -732,8 +741,8 @@ class Lay {
         $atypes['y'] = array('top', 'bottom');
         $atypes['both'] = array('center', 'justify', 'strict-justify', 'baseline');
         if (!in_array($p[$name], $atypes['both'])
-            and !in_array($p[$name], $atypes[$type{0}])) {
-          $err = 'invalid '.$type{0}.' alignment type';
+            and !in_array($p[$name], $atypes[$type[0]])) {
+          $err = 'invalid '.$type[0].' alignment type';
         }
         break;
       case 'boolean':

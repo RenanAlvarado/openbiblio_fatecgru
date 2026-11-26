@@ -160,10 +160,10 @@ class Settings {
    ****************************************************************************
    */
   function setLibraryName($value) {
-    $this->_libraryName = trim($value);
+    $this->_libraryName = trim($value === null ? "" : $value);
   }
   function setLibraryImageUrl($value) {
-    $this->_libraryImageUrl = trim($value);
+    $this->_libraryImageUrl = trim($value === null ? "" : $value);
   }
   function setUseImageFlg($value) {
     if ($value) {
@@ -173,16 +173,16 @@ class Settings {
     }
   }
   function setLibraryHours($value) {
-    $this->_libraryHours = trim($value);
+    $this->_libraryHours = trim($value === null ? "" : $value);
   }
   function setLibraryPhone($value) {
-    $this->_libraryPhone = trim($value);
+    $this->_libraryPhone = trim($value === null ? "" : $value);
   }
   function setLibraryUrl($value) {
-    $this->_libraryUrl = trim($value);
+    $this->_libraryUrl = trim($value === null ? "" : $value);
   }
   function setOpacUrl($value) {
-    $this->_opacUrl = trim($value);
+    $this->_opacUrl = trim($value === null ? "" : $value);
   }
   function setSessionTimeout($value) {
     $temp = trim($value);
@@ -234,10 +234,10 @@ class Settings {
     $this->_locale = trim($value);
   }
   function setCharset($value) {
-    $this->_charset = trim($value);
+    $this->_charset = trim($value === null ? "" : $value);
   }
   function setHtmlLangAttr($value) {
-    $this->_htmlLangAttr = trim($value);
+    $this->_htmlLangAttr = trim($value === null ? "" : $value);
   }
 
 }

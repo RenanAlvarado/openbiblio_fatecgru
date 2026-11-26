@@ -29,7 +29,7 @@ class Query {
   /* This static method shares the actual DBMS connection
    * with all Query instances.
    */
-  function _connect_e() {
+  static function _connect_e() {
     static $link;
     if (!isset($link)) {
       if (!function_exists('mysqli_connect')) {

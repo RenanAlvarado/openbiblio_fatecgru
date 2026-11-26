@@ -152,7 +152,7 @@ class Staff {
    ****************************************************************************
    */
   function setFirstName($firstName) {
-    $this->_firstName = trim($firstName);
+    $this->_firstName = trim($firstName === null ? "" : $firstName);
   }
   /****************************************************************************
    * @return string Staff username

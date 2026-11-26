@@ -56,7 +56,7 @@ class SessionQuery extends Query {
     if (!$this->_query($sql, "Error deleting session information.")) {
       return false;
     }
-    srand((double) microtime() * 1000000);
+    srand((int) ((double) microtime() * 1000000));
     $token = rand(-10000,10000);
     $sql = $this->mkSQL("insert into session "
                         . "values (%N, sysdate(), %N) ",
