@@ -104,7 +104,7 @@
       <?php echo H($hist->getAuthor());?>
     </td>
     <td class="primary" valign="top" >
-      <?php echo H($biblioStatusDm[$hist->getStatusCd()]);?>
+      <?php echo H(isset($biblioStatusDm[$hist->getStatusCd()]) ? $biblioStatusDm[$hist->getStatusCd()] : $hist->getStatusCd());?>
     </td>
     <td class="primary" valign="top" >
       <?php echo H($hist->getStatusBeginDt());?>

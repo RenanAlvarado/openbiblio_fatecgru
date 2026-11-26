@@ -556,20 +556,26 @@ function changePage(page,sort)
                 <a href="javascript:returnLookup('barcodesearch','barcodeNmbr','<?php echo H(addslashes($biblio->getBarcodeNmbr()));?>')"><?php echo $loc->getText("biblioSearchOutIn"); ?></a> | <a href="javascript:returnLookup('holdForm','holdBarcodeNmbr','<?php echo H(addslashes($biblio->getBarcodeNmbr()));?>')"><?php echo $loc->getText("biblioSearchHold"); ?></a>
               <?php } ?>
             </font></td>
-            <td class="primary" ><font class="small"><b><?php echo $loc->getText("biblioSearchCopyStatus"); ?></b>: <?php echo H($biblioStatusDm[$biblio->getStatusCd()]);?></font></td>
+            <td class="primary" ><font class="small"><b><?php echo $loc->getText("biblioSearchCopyStatus"); ?></b>: <?php echo H(isset($biblioStatusDm[$biblio->getStatusCd()]) ? $biblioStatusDm[$biblio->getStatusCd()] : $biblio->getStatusCd());?></font></td>
           </tr>
           <?php 
         }
       } else {
         $priorBibid = $biblio->getBibid();
+        $materialCd = $biblio->getMaterialCd();
+        $collectionCd = $biblio->getCollectionCd();
+        $materialLabel = isset($materialTypeDm[$materialCd]) ? $materialTypeDm[$materialCd] : $materialCd;
+        $collectionLabel = isset($collectionDm[$collectionCd]) ? $collectionDm[$collectionCd] : $collectionCd;
+        $materialImageFile = isset($materialImageFiles[$materialCd]) ? $materialImageFiles[$materialCd] : "";
 
   ?>
 
   <tr>
     <td nowrap="true" class="primary" valign="top" align="center" rowspan="2">
       <?php echo H($biblioQ->getCurrentRowNmbr());?>.<br />
-      <a href="../shared/biblio_view.php?bibid=<?php echo HURL($biblio->getBibid());?>&amp;tab=<?php echo HURL($tab);?>">
-      <img src="../images/<?php echo HURL($materialImageFiles[$biblio->getMaterialCd()]);?>" width="20" height="20" border="0" align="bottom" alt="<?php echo H($materialTypeDm[$biblio->getMaterialCd()]);?>"></a>
+      <?php if ($materialImageFile != "") { ?>
+      <a href="../shared/biblio_view.php?bibid=<?php echo HURL($biblio->getBibid());?>&amp;tab=<?php echo HURL($tab);?>"><img src="../images/<?php echo HURL($materialImageFile);?>" width="20" height="20" border="0" align="bottom" alt="<?php echo H($materialLabel);?>"></a>
+      <?php } ?>
     </td>
     <td class="primary" valign="top" colspan="2">
       <table class="primary" width="100%">
@@ -583,11 +589,11 @@ function changePage(page,sort)
         </tr>
         <tr>
           <td class="noborder" valign="top"><font class="small"><b><?php echo $loc->getText("biblioSearchMaterial"); ?>:</b></font></td>
-          <td class="noborder" colspan="3"><font class="small"><?php echo H($materialTypeDm[$biblio->getMaterialCd()]);?></font></td>
+          <td class="noborder" colspan="3"><font class="small"><?php echo H($materialLabel);?></font></td>
         </tr>
         <tr>
           <td class="noborder" valign="top"><font class="small"><b><?php echo $loc->getText("biblioSearchCollection"); ?>:</b></font></td>
-          <td class="noborder" colspan="3"><font class="small"><?php echo H($collectionDm[$biblio->getCollectionCd()]);?></font></td>
+          <td class="noborder" colspan="3"><font class="small"><?php echo H($collectionLabel);?></font></td>
         </tr>
         <tr>
           <td class="noborder" valign="top" nowrap="yes"><font class="small"><b><?php echo $loc->getText("biblioSearchCall"); ?>:</b></font></td>
@@ -605,7 +611,7 @@ function changePage(page,sort)
             <a href="javascript:returnLookup('barcodesearch','barcodeNmbr','<?php echo H(addslashes($biblio->getBarcodeNmbr()));?>')"><?php echo $loc->getText("biblioSearchOutIn"); ?></a> | <a href="javascript:returnLookup('holdForm','holdBarcodeNmbr','<?php echo H(addslashes($biblio->getBarcodeNmbr()));?>')"><?php echo $loc->getText("biblioSearchHold"); ?></a>
           <?php } ?>
         </font></td>
-        <td class="primary" ><font class="small"><b><?php echo $loc->getText("biblioSearchCopyStatus"); ?></b>: <?php echo H($biblioStatusDm[$biblio->getStatusCd()]);?></font></td>
+        <td class="primary" ><font class="small"><b><?php echo $loc->getText("biblioSearchCopyStatus"); ?></b>: <?php echo H(isset($biblioStatusDm[$biblio->getStatusCd()]) ? $biblioStatusDm[$biblio->getStatusCd()] : $biblio->getStatusCd());?></font></td>
       </tr>
     <?php } else { ?>
       <tr>

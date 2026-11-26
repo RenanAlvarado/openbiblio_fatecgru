@@ -106,7 +106,7 @@
       <?php echo H($hold->getLastName());?></a>
     </td>
     <td class="primary" valign="top" >
-      <?php echo H($biblioStatusDm[$hold->getStatusCd()]);?>
+      <?php echo H(isset($biblioStatusDm[$hold->getStatusCd()]) ? $biblioStatusDm[$hold->getStatusCd()] : $hold->getStatusCd());?>
     </td>
     <td class="primary" valign="top" >
       <?php echo H($hold->getDueBackDt());?>

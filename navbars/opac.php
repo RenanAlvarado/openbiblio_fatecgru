@@ -5,12 +5,13 @@
  
   require_once("../classes/Localize.php");
   $navLoc = new Localize(OBIB_LOCALE,"navbars");
+  $opacAppPath = rtrim(str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
 ?>
 
 
 <div class="opac-nav-utilities">
   <a href="javascript:popSecondary('../shared/help.php<?php if (isset($helpPage)) echo "?page=".H(addslashes(U($helpPage))); ?>')"><?php echo $navLoc->getText("Help"); ?></a>
-  <a href="/openbiblio_fatecgru/shared/loginform.php">Área administrativa</a>
+  <a href="<?php echo H($opacAppPath . '/shared/loginform.php'); ?>">Área administrativa</a>
 </div>
 <div class="opac-nav-primary">
   <?php if ($nav == "home") { ?>

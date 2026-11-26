@@ -138,14 +138,17 @@
 <?php
   } else {
     while ($biblio = $biblioQ->fetchRow()) {
+      $materialCd = $biblio->getMaterialCd();
+      $materialLabel = isset($materialTypeDm[$materialCd]) ? $materialTypeDm[$materialCd] : $materialCd;
+      $materialImageFile = isset($materialImageFiles[$materialCd]) ? $materialImageFiles[$materialCd] : "";
 ?>
   <tr>
     <td class="primary" valign="top" nowrap>
       <?php echo H($biblio->getStatusBeginDt());?>
     </td>
     <td class="primary" valign="top" nowrap>
-      <img src="../images/<?php echo HURL($materialImageFiles[$biblio->getMaterialCd()]);?>" width="20" height="20" border="0" align="middle" alt="<?php echo H($materialTypeDm[$biblio->getMaterialCd()]);?>">
-      <?php echo H($materialTypeDm[$biblio->getMaterialCd()]);?>
+      <?php if ($materialImageFile != "") { ?><img src="../images/<?php echo HURL($materialImageFile);?>" width="20" height="20" border="0" align="middle" alt="<?php echo H($materialLabel);?>"><?php } ?>
+      <?php echo H($materialLabel);?>
     </td>
     <td class="primary" valign="top" >
       <?php echo H($biblio->getTitle());?>

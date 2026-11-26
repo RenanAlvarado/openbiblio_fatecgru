@@ -95,7 +95,7 @@
       <?php echo H($hist->getBiblioBarcodeNmbr());?>
     </td>
     <td class="primary" valign="top" >
-      <?php echo H($biblioStatusDm[$hist->getStatusCd()]);?>
+      <?php echo H(isset($biblioStatusDm[$hist->getStatusCd()]) ? $biblioStatusDm[$hist->getStatusCd()] : $hist->getStatusCd());?>
     </td>
     <td class="primary" valign="top" >
       <?php if($hist->getMbrid()) { ?>

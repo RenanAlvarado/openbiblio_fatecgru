@@ -359,14 +359,17 @@ function hideDueDate() {
 <?php
   } else {
     while ($biblio = $biblioQ->fetchRow()) {
+      $materialCd = $biblio->getMaterialCd();
+      $materialLabel = isset($materialTypeDm[$materialCd]) ? $materialTypeDm[$materialCd] : $materialCd;
+      $materialImageFile = isset($materialImageFiles[$materialCd]) ? $materialImageFiles[$materialCd] : "";
 ?>
   <tr>
     <td class="primary" valign="top" nowrap="yes">
       <?php echo H($biblio->getStatusBeginDt());?>
     </td>
     <td class="primary" valign="top">
-      <img src="../images/<?php echo HURL($materialImageFiles[$biblio->getMaterialCd()]);?>" width="20" height="20" border="0" align="middle" alt="<?php echo H($materialTypeDm[$biblio->getMaterialCd()]);?>">
-      <?php echo H($materialTypeDm[$biblio->getMaterialCd()]);?>
+      <?php if ($materialImageFile != "") { ?><img src="../images/<?php echo HURL($materialImageFile);?>" width="20" height="20" border="0" align="middle" alt="<?php echo H($materialLabel);?>"><?php } ?>
+      <?php echo H($materialLabel);?>
     </td>
     <td class="primary" valign="top" >
       <?php echo H($biblio->getBarcodeNmbr());?>
@@ -477,6 +480,9 @@ function hideDueDate() {
 <?php
   } else {
     while ($hold = $holdQ->fetchRow()) {
+      $materialCd = $hold->getMaterialCd();
+      $materialLabel = isset($materialTypeDm[$materialCd]) ? $materialTypeDm[$materialCd] : $materialCd;
+      $materialImageFile = isset($materialImageFiles[$materialCd]) ? $materialImageFiles[$materialCd] : "";
 ?>
   <tr>
     <td class="primary" valign="top" nowrap="yes">
@@ -486,8 +492,8 @@ function hideDueDate() {
       <?php echo H($hold->getHoldBeginDt());?>
     </td>
     <td class="primary" valign="top">
-      <img src="../images/<?php echo HURL($materialImageFiles[$hold->getMaterialCd()]);?>" width="20" height="20" border="0" align="middle" alt="<?php echo H($materialTypeDm[$hold->getMaterialCd()]);?>">
-      <?php echo H($materialTypeDm[$hold->getMaterialCd()]);?>
+      <?php if ($materialImageFile != "") { ?><img src="../images/<?php echo HURL($materialImageFile);?>" width="20" height="20" border="0" align="middle" alt="<?php echo H($materialLabel);?>"><?php } ?>
+      <?php echo H($materialLabel);?>
     </td>
     <td class="primary" valign="top" >
       <?php echo H($hold->getBarcodeNmbr());?>
@@ -499,7 +505,7 @@ function hideDueDate() {
       <?php echo H($hold->getAuthor());?>
     </td>
     <td class="primary" valign="top" >
-      <?php echo H($biblioStatusDm[$hold->getStatusCd()]);?>
+      <?php echo H(isset($biblioStatusDm[$hold->getStatusCd()]) ? $biblioStatusDm[$hold->getStatusCd()] : $hold->getStatusCd());?>
     </td>
     <td class="primary" valign="top" >
       <?php echo H($hold->getDueBackDt());?>

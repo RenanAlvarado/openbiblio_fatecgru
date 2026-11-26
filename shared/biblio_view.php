@@ -106,6 +106,10 @@
     displayErrorPage($biblioQ);
   }
   $biblioFlds = $biblio->getBiblioFields();
+  $materialCd = $biblio->getMaterialCd();
+  $materialLabel = isset($materialTypeDm[$materialCd]) ? $materialTypeDm[$materialCd] : $materialCd;
+  $collectionCd = $biblio->getCollectionCd();
+  $collectionLabel = isset($collectionDm[$collectionCd]) ? $collectionDm[$collectionCd] : $collectionCd;
 
   #**************************************************************************
   #*  Show bibliography info.
@@ -121,10 +125,6 @@
   }
 
   if ($tab == "opac") {
-    $materialCd = $biblio->getMaterialCd();
-    $materialLabel = isset($materialTypeDm[$materialCd]) ? $materialTypeDm[$materialCd] : $materialCd;
-    $collectionCd = $biblio->getCollectionCd();
-    $collectionLabel = isset($collectionDm[$collectionCd]) ? $collectionDm[$collectionCd] : "";
     $callNumber = trim($biblio->getCallNmbr1()." ".$biblio->getCallNmbr2()." ".$biblio->getCallNmbr3());
     $title = isset($biblioFlds["245a"]) ? trim($biblioFlds["245a"]->getFieldData()) : "";
     $author = isset($biblioFlds["100a"]) ? trim($biblioFlds["100a"]->getFieldData()) : "";
@@ -253,7 +253,7 @@
       <?php echo $loc->getText("biblioViewMaterialType"); ?>:
     </td>
     <td valign="top" class="primary">
-      <?php echo H($materialTypeDm[$biblio->getMaterialCd()]);?>
+      <?php echo H($materialLabel);?>
     </td>
   </tr>
   <tr>
@@ -261,7 +261,7 @@
       <?php echo $loc->getText("biblioViewCollection"); ?>:
     </td>
     <td valign="top" class="primary">
-      <?php echo H(isset($collectionDm[$biblio->getCollectionCd()]) ? $collectionDm[$biblio->getCollectionCd()] : "");?>
+      <?php echo H($collectionLabel);?>
     </td>
   </tr>
   <tr>
@@ -384,6 +384,8 @@
     <?php } else {
       $row_class = "primary";
       while ($copy = $copyQ->fetchCopy()) {
+        $copyStatus = $copy->getStatusCd();
+        $copyStatusLabel = isset($biblioStatusDm[$copyStatus]) ? $biblioStatusDm[$copyStatus] : $copyStatus;
   ?>
     <tr>
       <?php if ($tab == "cataloging") { ?>
@@ -400,7 +402,7 @@
       <td valign="top" class="<?php echo H($copy->getCopyDesc()); ?>
       </td>
       <td valign="top" class="<?php echo H($row_class);?>">
-        <?php echo H($biblioStatusDm[$copy->getStatusCd()]); ?>
+        <?php echo H($copyStatusLabel); ?>
       </td>
       <td valign="top" class="<?php echo H($row_class);?>">
         <?php echo H($copy->getStatusBeginDt()); ?>
